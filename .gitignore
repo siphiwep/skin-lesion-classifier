@@ -1,0 +1,15 @@
+*.pyc
+
+#VSCODE SETTINGS
+.vscode/*
+
+
+__pycache__
+
+*.png
+#compressed files
+*.pkl
+
+
+# MODEL FILES
+*.h5
