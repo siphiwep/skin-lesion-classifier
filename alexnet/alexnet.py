@@ -47,7 +47,7 @@ class AlexNet:
         return x
 
     def model(self):    
-        # 1st LAYER
+        # 1st LAYE
         x =  self.conv_layer(self.init, filters=96, kernel_size=(11,11), strides=(4,4),
             padding="valid", max_pooling=True, activation='relu', name='conv_1')
 
@@ -76,6 +76,7 @@ class AlexNet:
         # 5Th LAYER
         x =  self.conv_layer(x, filters=256, kernel_size=(3,3),strides=(1,1),
             padding="same", max_pooling=True, name="conv_5")
+
         x = BatchNormalization()(x) # apply batch normalisation.
 
         # 6 FLATTEN 
@@ -83,13 +84,11 @@ class AlexNet:
 
         # Fully Connected LAYER 1
         x = Dense(4096,  kernel_regularizer=l2(0))(x)
-        x = BatchNormalization()(x) # apply batch normalisation.
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
 
         # FULLY CONNECTED LAYER 2
         x = Dense(4096,  kernel_regularizer=l2(0))(x)
-        x = BatchNormalization()(x) # apply batch normalisation.
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
 

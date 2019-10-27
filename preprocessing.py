@@ -3,6 +3,7 @@ import cv2 as openCv
 import tensorflow as tf
 import numpy as np
 import matplotlib.image as mpimg 
+import matplotlib.pyplot as plt
 from PIL import Image
 from albumentations import Compose, CLAHE, CenterCrop, ToFloat
 IMAGE_SIZE = 256
@@ -14,18 +15,24 @@ IMAGE_PATH = ''
 SEED = 1000
 
 AUG_PATH='data' # Store the transformed image into the project folder
-IMAGE_PATH="C:/Users/Siphiwe Phiri/Documents/thesis/data" #  Folder containing all the image to augment.
+IMAGE_PATH="D:\Projects\phdata\dataset" #  Folder containing all the image to augment.
+BINARY_DATA='D:\Projects\phdata\mask'
 
-def resize_images(filepath, width=256, height=256):
+def read_images(filepath):
+    all_images = []
+    images = [i for i in os.listdir(os.path.join(filepath)) if i.endswith('.bmp')]
+    for path in images:
+        all_images.append(openCv.imread(os.path.join(filepath, path)))
+    return all_images
+
+def resize_images(images, width=256, height=256):
     resized_images = []
-    images = [i for i in os.listdir(os.path.join(filepath)) if i.endswith('.jpg')]
     for image in images:
-        img = openCv.imread(os.path.join(filepath, image))
-        # imgClahe = applyClahe(img)
-        resize_image = openCv.resize(img, (IMAGE_SIZE,IMAGE_SIZE))
+        resize_image = openCv.resize(image, (IMAGE_SIZE,IMAGE_SIZE))
         resized_images.append(resize_image)
     np.array(resized_images, dtype ="float") / 255.0
     return resized_images
+
 def apply_central_crop():
     return Compose([
         CenterCrop(CROP_SIZE, CROP_SIZE)
@@ -41,7 +48,7 @@ def central_crop(images):
 def save_images(filepath, images, prefix="untitled"):
     for index, image in enumerate(images):
         filename = filepath+'/'+prefix+'_'+str(index)+'.jpg'
-        openCv.imwrite(filename, image)
+        openCv.imwrite(filename, image, [int(openCv.IMWRITE_JPEG_QUALITY), 90])
         # Image.fromarray(image, mode='RGB').save(filename)
         # import pdb; pdb.set_trace()
         # imageToSave = Image.fromarray(image)
@@ -105,21 +112,46 @@ def add_augs():
         for subdir in os.listdir(os.path.join(IMAGE_PATH, parentdir)):
             print("Reading sub-folders in {0} ".format(subdir))
 
-            images = resize_images(os.path.join(IMAGE_PATH, parentdir, subdir))
+            images = read_images(os.path.join(IMAGE_PATH, parentdir, subdir))
+            masks = read_images(os.path.join(BINARY_DATA, parentdir, subdir))
+            no_hair_images = removeHair(images)
+            segmented = segment_images(no_hair_images,masks )
             # print("{} will be rotated and flipped".format(len(images)))
-            rotated_images = rotate_images(images)
+            resized_images = resize_images(segmented)
+
+            rotated_images = rotate_images(resized_images)
             # print("Rotated {}".format(len(cropped_images_rot)))
             # save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
 
             # flipped_images = flip_images(images)
-            cropped_images_fli = central_crop(rotated_images)
+            # cropped_images_fli = central_crop(rotated_images)
             # print("Flipped  {}".format(len(flipped_images)))
             # im = applyClahe(images)
             # print("Cropped  {}".format(len(cropped_images_fli)))
             # flipped_rotated =  np.concatenate((rotated_images, flipped_images))
             # cropped_images = random_crop(flipped_rotated,5)
-            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_fli, prefix="im")
-        
+            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=rotated_images, prefix="im")
+
+def removeHair(images):
+    r_images = []
+    for img in images:
+        grey = openCv.cvtColor(img, openCv.COLOR_RGB2GRAY)
+        kernel = openCv.getStructuringElement(1,(17,17))
+        blackhat = openCv.morphologyEx(grey, openCv.MORPH_BLACKHAT, kernel)
+        ret,thresh2 = openCv.threshold(blackhat,10,255,openCv.THRESH_BINARY)
+        dst = openCv.inpaint(img,thresh2,1,openCv.INPAINT_TELEA)
+        color = openCv.cvtColor(img, openCv.COLOR_RGB2GRAY)
+        r_images.append(dst)
+    return r_images
+
+def segment_images(images, masks):
+    segmented=[]
+    for image, mask in zip(images, masks):
+        mask_out = openCv.subtract(mask,image)
+        mask_out = openCv.subtract(mask,mask_out)
+        segmented.append(mask_out)
+    return segmented
+
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):
         if(parentdir == 'all'):

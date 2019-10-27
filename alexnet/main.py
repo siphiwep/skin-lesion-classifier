@@ -19,15 +19,15 @@ if __name__ == "__main__":
     # CREATE MODEL 
 
     # # this is the model we will train
-    alexnet = AlexNet(input_shape=(224, 224, 3), classes=3)
+    alexnet = AlexNet(input_shape=(227, 227, 3), classes=3)
     model = alexnet.model()
     model.summary()
     util = ModelUtils(epochs=50)
-    util.get_train_data()
-    # util.get_test_data(resize=(227,227))
+    util.get_train_data(resize=(227,227))
+    # # util.get_test_data(resize=(227,227))
     util.train(model)
     util.evaluate()
-    # util.save()
+    # # util.save()
     util.confusion_matrix()
     util.plot_loss_accuracy()
     
