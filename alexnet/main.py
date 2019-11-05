@@ -31,5 +31,5 @@ if __name__ == "__main__":
     util.confusion_matrix()
     util.plot_loss_accuracy()
     
-    time_elapsed = datetime.now() - start 
-    print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
+    # time_elapsed = datetime.now() - start 
+    # print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
