@@ -2,7 +2,6 @@
     Author: Pike Msonda
     Description: AlexNet implementation using Keras api
 """
-
 from keras.layers import Input
 from keras.layers.merge import concatenate
 from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D
@@ -16,7 +15,7 @@ import random
 tf.set_random_seed(1000)
 np.random.seed(1000)
 random.seed(1000)
-REGULARIZER= 0.001
+REGULARIZER= 0
 class AlexNet:
 
     def __init__(self, input_shape, classes, weights_path=''):
@@ -101,6 +100,6 @@ class AlexNet:
         # Ouput Layer. Set class 
         output = self.output_layer(x, self.classes)
 
-        model = Model(self.init, output, name='AlexNet')
+        model = Model(self.init, output, name='alexnet')
 
         return model

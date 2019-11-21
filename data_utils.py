@@ -2,6 +2,7 @@ from __future__ import division, print_function, absolute_import
 import os
 import csv
 import cv2
+import json
 import random
 import numpy as np
 from PIL import Image
@@ -138,7 +139,7 @@ def get_labels(y_onehot):
     labels = np.empty(len(y), dtype=object)
     labels[y == 0 ] = "CN"
     labels[y == 1 ] = "AN"
-    labels[y == 1 ] = "ML"
+    labels[y == 2 ] = "ML"
 
     return labels
 
@@ -153,11 +154,15 @@ def plot_confusion_matrix(cm, classes,
         print('Confusion matrix, without normalization')
 
     print(cm)
+    labels = np.empty(len(classes), dtype=object)
 
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
     tick_marks = np.arange(len(classes))
+    labels[tick_marks == 0 ] = "CN"
+    labels[tick_marks == 1 ] = "AN"
+    labels[tick_marks == 2 ] = "ML"
     plt.xticks(tick_marks, classes, rotation=45)
     plt.yticks(tick_marks, classes)
 
@@ -188,22 +193,25 @@ def write_csv_file(file, data, headers):
             import matplotlib.pyplot as plt
 
             
-def plot_accuracy_loss_graph(history):
+def plot_accuracy_loss_graph(path=None, name=None):
     # Plot training & validation accuracy values
-    plt.plot(history.history['acc'])
-    plt.plot(history.history['val_acc'])
-    plt.title('Model accuracy')
-    plt.ylabel('Accuracy')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Test'], loc='upper left')
-    plt.show()
-
-    # Plot training & validation loss values
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('Model loss')
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Test'], loc='upper left')
-    plt.show()
-
+    plt.style.use('ggplot')
+    if name== None:
+        name =""
+    with open(path) as history_file:
+        data = json.load(history_file)
+        plt.plot(data['acc'])
+        plt.plot(data['val_acc'])
+        plt.title('Model Accuracy ('+name+')')
+        plt.ylabel('Accuracy')
+        plt.xlabel('Epoch')
+        plt.legend(['Train', 'Val'], loc='upper left')
+        plt.show()
+        # Plot training & validation loss values
+        plt.plot(data['loss'])
+        plt.plot(data['val_loss'])
+        plt.title('Model Loss ('+name+')')
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+        plt.legend(['Train', 'Val'], loc='upper left')
+        plt.show()
