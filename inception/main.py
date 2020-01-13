@@ -14,15 +14,16 @@ if __name__ == "__main__":
     # CREATE MODEL 
 
     # # this is the model we will train
-    inceptionV3 = InceptionV3(input_shape=(224, 224, 3), classes=1000, activation=ACTIVATION, include_top=True, weights='imagenet')
+    inceptionV3 = InceptionV3(input_shape=(224, 224, 3), classes=3, activation=ACTIVATION, include_top=False, weights='imagenet')
     model = inceptionV3.model()
-    model = set_non_trainable(model)
+    # model = set_non_trainable(model)
     x = model.output
     x=Dense(1024,activation=ACTIVATION)(x) 
-    x=Dense(3,activation=ACTIVATION)(x) 
+    x=Dense(1024,activation=ACTIVATION)(x) 
+    x=Dense(3,activation='softmax')(x) 
     model = Model(model.input, x, name='inceptionV3')
     model.summary()
-    util = ModelUtils(epochs=50)
+    util = ModelUtils(epochs=25)
     util.get_train_data(resize=(224,224))
 
     util.train(model)

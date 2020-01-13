@@ -22,7 +22,7 @@ class ModelUtils():
         self.epochs=epochs
         self.test_split=test_split
         self.validation=validation_split
-        self.batch_size = 16
+        self.batch_size = 32
 
     def get_train_data(self, name=FOLDER, folder='../data/train', resize=None):
         self.x, self.y = build_image_dataset_from_dir(os.path.join(folder, name),

@@ -14,21 +14,21 @@ if __name__ == "__main__":
     # CREATE MODEL 
 
     # # this is the model we will train
-    resnet50 = VGG19(input_shape=(224, 224, 3), classes=3, activation=ACTIVATION, include_top=False, weights='imagenet')
-    model = resnet50.model()
-    model = set_non_trainable(model)
+    vgg = VGG19(input_shape=(224, 224, 3), classes=3, activation=ACTIVATION, include_top=False, weights='imagenet')
+    model = vgg.model()
+    # model = set_non_trainable(model)
     x = model.output
     x=Dense(4096,activation=ACTIVATION)(x) 
     x=Dense(4096,activation=ACTIVATION)(x) 
-    x=Dense(3,activation=ACTIVATION)(x) 
+    x=Dense(3,activation='softmax')(x) 
     model = Model(model.input, x, name='vgg19')
     model.summary()
-    util = ModelUtils(epochs=50)
+    util = ModelUtils(epochs=20)
     util.get_train_data(resize=(224,224))
 
     util.train(model)
     util.evaluate()
-    # util.save()
+    util.save()
     util.confusion_matrix(title=model.name)
     util.plot_loss_accuracy(path=model.name+'.json', name=model.name)
     
