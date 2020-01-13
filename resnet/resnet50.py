@@ -152,7 +152,7 @@ class  ResNet50:
 
         if self.include_top:
             x = layers.GlobalAveragePooling2D(name='avg_pool')(x)
-            x = layers.Dense(classes, activation='softmax', name='fc1000')(x)
+            x = layers.Dense(self.classes, activation='softmax', name='fc1000')(x)
         else:
             if self.pooling == 'avg':
                 x = layers.GlobalAveragePooling2D()(x)

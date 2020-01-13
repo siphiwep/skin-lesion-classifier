@@ -14,9 +14,6 @@ __pycache__
 # MODEL FILES
 *.h5
 
-<<<<<<< HEAD
-=======
 *.
 
->>>>>>> 8a07e19b2ddbc65541cd32da5917186ebbc97aab
 *.json
