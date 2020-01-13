@@ -19,16 +19,17 @@ if __name__ == "__main__":
     model = set_non_trainable(model)
     x = model.output
     x=Dense(1024,activation=ACTIVATION)(x) 
+    x=Dense(3,activation=ACTIVATION)(x) 
     model = Model(model.input, x, name='inceptionV3')
     model.summary()
-    # util = ModelUtils(epochs=50)
-    # util.get_train_data(resize=(224,224))
+    util = ModelUtils(epochs=50)
+    util.get_train_data(resize=(224,224))
 
-    # util.train(model)
-    # util.evaluate()
-    # util.save()
-    # util.confusion_matrix(title="AlexNet")
-    # util.plot_loss_accuracy(path=model.name+'.json', name="AlexNet")
+    util.train(model)
+    util.evaluate()
+    util.save()
+    util.confusion_matrix(title=model.name)
+    util.plot_loss_accuracy(path=model.name+'.json', name=model.name)
     
     time_elapsed = datetime.now() - start 
     print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
