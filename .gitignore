@@ -14,4 +14,4 @@ __pycache__
 # MODEL FILES
 *.h5
 
-*.
+*.json

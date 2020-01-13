@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import json
 import keras as ke
 from keras.optimizers import SGD
 from sklearn.metrics import confusion_matrix
@@ -8,8 +9,6 @@ from keras.models import load_model
 from keras.preprocessing.image import ImageDataGenerator
 from data_utils import build_image_dataset_from_dir, get_labels, onehot_to_cat, plot_confusion_matrix, plot_accuracy_loss_graph
 from keras import backend as K
-from utils.data_sequence import DataSequence
-from utils.augs import AUGMENTATIONS_TRAIN, AUGMENTATIONS_TEST
 import tensorflow as tf
 import random
 tf.set_random_seed(1000)
@@ -23,7 +22,7 @@ class ModelUtils():
         self.epochs=epochs
         self.test_split=test_split
         self.validation=validation_split
-        self.batch_size = 8
+        self.batch_size = 16
 
     def get_train_data(self, name=FOLDER, folder='../data/train', resize=None):
         self.x, self.y = build_image_dataset_from_dir(os.path.join(folder, name),
@@ -82,12 +81,13 @@ class ModelUtils():
         if(os.path.exists('../models/'+self.model.name+FOLDER+'.h5')):
             self.model.load_weights('../models/'+self.model.name+FOLDER+'.h5') 
         else:
-            # self.history = self.model.fit_generator(self.trainGen,
-            #     epochs=self.epochs, verbose=1, shuffle=True,
-            #     validation_data=self.valGen, workers=2, use_multiprocessing=False)
+       
             self.history = self.model.fit_generator(aug.flow(self.trainX,self.trainY, batch_size=self.batch_size, shuffle=True, seed=1000),
                 steps_per_epoch=len(self.trainX)/self.batch_size ,epochs=self.epochs, verbose=1, 
                 validation_data=(self.valX, self.valY))
+
+            with open(self.model.name+'.json', 'w') as file:
+                json.dump(self.history.history, file)
 
 
     def evaluate(self):
@@ -100,14 +100,21 @@ class ModelUtils():
         self.model.save_weights(folder+'/'+self.model.name+FOLDER+'.h5')
 
     def optimizer(self):
-        return SGD(lr=0.001, momentum=0.9, decay=0.0005)
+        return SGD(lr=0.0001, momentum=0.9, decay=0.0005)
 
-    def confusion_matrix(self):
+    def confusion_matrix(self, title=None):
+        if title== None:
+            title = self.model.name+FOLDER
         predictions = self.model.predict(self.valX)
+        class_counts = onehot_to_cat(self.valY)
+        print("Class counts")
+        print(np.unique(class_counts, return_counts=True))
+        print("=================================================")
+
         labels = list(set(get_labels(self.valY))) 
         cm = confusion_matrix(get_labels(self.valY),get_labels(predictions))
         print("Confusion Matrix {}".format(cm))
-        plot_confusion_matrix(cm, labels, title=self.model.name+FOLDER)
+        plot_confusion_matrix(cm, labels, title=title)
 
-    def plot_loss_accuracy(self):
-        plot_accuracy_loss_graph(self.history)
+    def plot_loss_accuracy(self, path, name):
+        plot_accuracy_loss_graph(path, name)

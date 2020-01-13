@@ -1,31 +1,30 @@
 import sys
 sys.path.append("..") 
 from data_utils import *
-from resnet50 import  ResNet50
+from resnet.resnet50 import ResNet50
 from datetime import datetime
 from utils.model_utils import ModelUtils
-
-DATASET_PATH = '../data/train/'
-TEST_PATH = 'D:\Data/test/'
-TEST_PATH_NAME=os.path.join(TEST_PATH, 'china.pkl')
-IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
+from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D, GlobalAveragePooling2D
+from keras.models import Model
+from keras.applications.vgg16 import VGG16
 
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
-    resnet50 = ResNet50(input_shape=(227,227,3), classes=2)
 
+    # # this is the model we will train
+    resnet50 = ResNet50(input_shape=(224, 224, 3), classes=3, activation='relu', include_top=False, weights='imagenet')
     model = resnet50.model()
-
     model.summary()
+    
+    # util = ModelUtils(epochs=50)
+    # util.get_train_data(resize=(224,224))
 
-    util = ModelUtils(epochs=40)
-    util.get_train_data()
-    # util.get_test_data()
-    util.train(model)
-    util.evaluate()
+    # util.train(model)
+    # util.evaluate()
     # util.save()
-    util.confusion_matrix()
+    # util.confusion_matrix(title="AlexNet")
+    # util.plot_loss_accuracy(path=model.name+'.json', name="AlexNet")
     
     time_elapsed = datetime.now() - start 
     print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))

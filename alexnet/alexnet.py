@@ -2,10 +2,10 @@
     Author: Pike Msonda
     Description: AlexNet implementation using Keras api
 """
-
 from keras.layers import Input
 from keras.layers.merge import concatenate
 from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D
+from utils.mish import Mish
 from keras.layers.convolutional import MaxPooling2D, AveragePooling2D, ZeroPadding2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import Model
@@ -16,35 +16,24 @@ import random
 tf.set_random_seed(1000)
 np.random.seed(1000)
 random.seed(1000)
-REGULARIZER= 0.001
+REGULARIZER= 0
 class AlexNet:
 
-    def __init__(self, input_shape, classes, weights_path=''):
+    def __init__(self, input_shape, classes, weights_path='', activation ='relu'):
         self.init = Input(input_shape)
         self.classes = classes
         self.weights_path = weights_path
+        self.activation = activation
 
     def conv_layer(self, x, filters,kernel_size, padding= "same", 
             kernel_regularizer=l2(REGULARIZER), strides=(1,1), max_pooling=True, 
-            activation="relu", name=None): 
+            name=None): 
 
         x = Conv2D(filters, kernel_size, strides=strides, padding=padding, 
-            activation=activation,kernel_regularizer=kernel_regularizer)(x)
+            activation=self.activation,kernel_regularizer=kernel_regularizer)(x)
         if (max_pooling):
             x = MaxPooling2D(pool_size=(3,3), strides=(2,2))(x)
  
-        return x
-
-    def output_layer(self,x, classes):
-        x = Dense(units=classes,  kernel_regularizer=l2(0))(x)
-        x = Activation('softmax')(x)
-        return x
-    
-    def dense_layer(self,x,units):
-        x = Dense(units)(x)
-        x = Activation('relu')(x)
-        x = Dropout(0.5)(x)
-        
         return x
 
     def model(self):    
@@ -85,12 +74,15 @@ class AlexNet:
 
         # Fully Connected LAYER 1
         x = Dense(4096,  kernel_regularizer=l2(REGULARIZER))(x)
-        x = Activation('relu')(x)
+        # x = Activation('relu')(x)
+        x = Activation(self.activation)(x)
+
         x = Dropout(0.5)(x)
 
         # FULLY CONNECTED LAYER 2
         x = Dense(4096,  kernel_regularizer=l2(REGULARIZER))(x)
-        x = Activation('relu')(x)
+        # x = Activation('relu')(x)
+        x = Activation(self.activation)(x)
         x = Dropout(0.5)(x)
 
         # FULLY CONNECTED LAYER 2
@@ -101,6 +93,6 @@ class AlexNet:
         # Ouput Layer. Set class 
         output = self.output_layer(x, self.classes)
 
-        model = Model(self.init, output, name='AlexNet')
+        model = Model(self.init, output, name='alexnet')
 
         return model
