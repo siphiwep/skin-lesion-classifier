@@ -8,7 +8,7 @@ from utils.model_utils import ModelUtils
 from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D, GlobalAveragePooling2D
 from keras.models import Model
 
-ACTIVATION='relu'
+ACTIVATION='Mish'
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
@@ -26,9 +26,9 @@ if __name__ == "__main__":
     util = ModelUtils(epochs=20)
     util.get_train_data(resize=(224,224))
 
-    util.train(model)
+    util.train(model, name=ACTIVATION)
     util.evaluate()
-    util.save()
+    util.save(name=ACTIVATION)
     util.confusion_matrix(title=model.name)
     util.plot_loss_accuracy(path=model.name+'.json', name=model.name)
     

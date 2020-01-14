@@ -23,12 +23,12 @@ if __name__ == "__main__":
     x=Dense(3,activation='softmax')(x) 
     model = Model(model.input, x, name='inceptionV3')
     model.summary()
-    util = ModelUtils(epochs=25)
+    util = ModelUtils(epochs=20)
     util.get_train_data(resize=(224,224))
 
-    util.train(model)
+    util.train(model, name=ACTIVATION)
     util.evaluate()
-    util.save()
+    util.save(name=ACTIVATION)
     util.confusion_matrix(title=model.name)
     util.plot_loss_accuracy(path=model.name+'.json', name=model.name)
     

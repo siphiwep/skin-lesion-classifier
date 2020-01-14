@@ -59,7 +59,7 @@ class ModelUtils():
         self.valX -= mean
         
 
-    def train(self, model):
+    def train(self, model, name=None):
         self.model = model
         self.model.compile(loss='categorical_crossentropy', optimizer=self.optimizer(), 
             metrics=['accuracy'])
@@ -78,8 +78,8 @@ class ModelUtils():
             self.x = np.moveaxis(self.x, -1, 1)
             self.valX = np.moveaxis(self.valX, -1, 1)
         
-        if(os.path.exists('../models/'+self.model.name+FOLDER+'.h5')):
-            self.model.load_weights('../models/'+self.model.name+FOLDER+'.h5') 
+        if(os.path.exists('../models/'+self.model.name+FOLDER+name+'.h5')):
+            self.model.load_weights('../models/'+self.model.name+FOLDER+name+'.h5') 
         else:
        
             self.history = self.model.fit_generator(aug.flow(self.trainX,self.trainY, batch_size=self.batch_size, shuffle=True, seed=1000),
@@ -96,8 +96,8 @@ class ModelUtils():
         print(score)
         print("%s: %.2f%%" % (self.model.metrics_names[-1], score[-1]))
 
-    def save(self, folder='../models'):
-        self.model.save_weights(folder+'/'+self.model.name+FOLDER+'.h5')
+    def save(self, folder='../models', name=None):
+        self.model.save_weights(folder+'/'+self.model.name+FOLDER+name+'.h5')
 
     def optimizer(self):
         return SGD(lr=0.0001, momentum=0.9, decay=0.0005)
