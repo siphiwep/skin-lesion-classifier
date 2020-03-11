@@ -6,6 +6,8 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from PIL import Image
 from albumentations import Compose, CLAHE, CenterCrop, ToFloat
+from keras.applications.imagenet_utils import preprocess_input
+
 IMAGE_SIZE = 256
 
 CROP_SIZE = 224

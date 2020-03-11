@@ -37,9 +37,7 @@ class ModelUtils():
         print("Training on {0}".format(len(self.trainX)))
         print("Validating on {0} ".format(len(self.valX)))
 
-
-        # self.trainGen =  DataSequence(self.trainX, self.trainY, self.batch_size, AUGMENTATIONS_TRAIN)
-        # self.valGen =  DataSequence(self.valX, self.valY, self.batch_size, AUGMENTATIONS_TEST)
+        
     def get_val_data(self, name=FOLDER, folder='../data/val', resize=None):
         self.valX, self.valY = build_image_dataset_from_dir(os.path.join(folder, name),
             dataset_file=os.path.join(folder, name+'.pkl'),
