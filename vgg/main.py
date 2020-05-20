@@ -23,12 +23,13 @@ if __name__ == "__main__":
     x=Dense(3,activation='softmax')(x) 
     model = Model(model.input, x, name='vgg19')
     model.summary()
-    util = ModelUtils(epochs=20)
+    util = ModelUtils(epochs=60)
     util.get_train_data(resize=(224,224))
-
+    util.get_val_data(resize=(224,224))
+    util.get_test_data(resize=(224,224))
     util.train(model, name=ACTIVATION)
     util.evaluate()
-    util.save(name=ACTIVATION)
+    # util.save(name=ACTIVATION)
     util.confusion_matrix(title=model.name)
     util.plot_loss_accuracy(path=model.name+'.json', name=model.name)
     

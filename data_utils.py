@@ -137,9 +137,9 @@ def store_model(model, path,filename):
 def get_labels(y_onehot):
     y = onehot_to_cat(y_onehot)
     labels = np.empty(len(y), dtype=object)
-    labels[y == 0 ] = "CN"
-    labels[y == 1 ] = "AN"
-    labels[y == 2 ] = "ML"
+    labels[y == 0 ] = "Melanoma"
+    labels[y == 1 ] = "Nevus"
+    labels[y == 2 ] = "SK"
 
     return labels
 
@@ -160,9 +160,9 @@ def plot_confusion_matrix(cm, classes,
     plt.title(title)
     plt.colorbar()
     tick_marks = np.arange(len(classes))
-    labels[tick_marks == 0 ] = "CN"
-    labels[tick_marks == 1 ] = "AN"
-    labels[tick_marks == 2 ] = "ML"
+    labels[tick_marks == 0 ] = "Melanoma"
+    labels[tick_marks == 1 ] = "Nevus"
+    labels[tick_marks == 2 ] = "SK"
     plt.xticks(tick_marks, classes, rotation=45)
     plt.yticks(tick_marks, classes)
 
