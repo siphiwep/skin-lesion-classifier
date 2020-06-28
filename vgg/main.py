@@ -8,7 +8,7 @@ from utils.model_utils import ModelUtils
 from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D, GlobalAveragePooling2D
 from keras.models import Model
 
-ACTIVATION='Mish'
+ACTIVATION='relu'
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
@@ -16,17 +16,22 @@ if __name__ == "__main__":
     # # this is the model we will train
     vgg = VGG19(input_shape=(224, 224, 3), classes=3, activation=ACTIVATION, include_top=False, weights='imagenet')
     model = vgg.model()
-    # model = set_non_trainable(model)
+    model = set_non_trainable(model)
     x = model.output
+    # x = Dropout(0.2) (x)
     x=Dense(4096,activation=ACTIVATION)(x) 
-    x=Dense(4096,activation=ACTIVATION)(x) 
+    x=Dense(4096,activation=ACTIVATION)(x)
+    # x = Dropout(0.2) (x)
+
     x=Dense(3,activation='softmax')(x) 
     model = Model(model.input, x, name='vgg19')
-    model.summary()
-    util = ModelUtils(epochs=60)
-    util.get_train_data(resize=(224,224))
-    util.get_val_data(resize=(224,224))
-    util.get_test_data(resize=(224,224))
+    # model.summary()
+
+    util = ModelUtils(epochs=20)
+    util.get_train_data()
+    util.get_val_data()
+    util.get_test_data()
+    # util.mean_subtraction()
     util.train(model, name=ACTIVATION)
     util.evaluate()
     # util.save(name=ACTIVATION)

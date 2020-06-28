@@ -26,7 +26,6 @@ if __name__ == "__main__":
     model.summary()
     util = ModelUtils(epochs=20)
     util.get_train_data(resize=(224,224))
-
     util.train(model, name=ACTIVATION)
     util.evaluate()
     util.save(name=ACTIVATION)

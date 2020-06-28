@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 from urllib import request
 from io import BytesIO
 import matplotlib.pyplot as plt
+from keras.preprocessing import image
 import itertools
 import random
 random.seed(1000)
@@ -32,10 +33,20 @@ def to_categorical(y, nb_classes=None):
         y = np.array(y)
         return (y[:, None] == np.unique(y)).astype(np.float32)
 
-
+def random_crop(img, random_crop_size):
+    # Note: image_data_format is 'channel_last'
+    assert img.shape[2] == 3
+    height, width = img.shape[0], img.shape[1]
+    dy, dx = random_crop_size
+    x = np.random.randint(0, width - dx + 1)
+    y = np.random.randint(0, height - dy + 1)
+    return img[y:(y+dy), x:(x+dx), :]
+    
 def load_image(in_image):
     # load image
-    img = Image.open(in_image)
+    img = image.img_to_array(image.load_img(in_image, target_size=(224, 224)))
+    # img = Image.open(in_image)
+    # import pdb; pdb.set_trace()
     # img = cv2.imread(in_image)
     return img
 
@@ -77,11 +88,14 @@ def image_dirs_to_samples(directory, resize=None, convert_to_color=False,
     samples, targets = directory_to_samples(directory, flags=filetypes)
     for i, s in enumerate(samples):
         samples[i] = load_image(s)
-        if resize:
-            samples[i] = resize_image(samples[i], resize[0], resize[1])
         if convert_to_color:
             samples[i] = convert_color(samples[i],'RGB')
-        samples[i] = pil_to_nparray(samples[i])
+
+        # samples[i] = pil_to_nparray(samples[i])
+
+        # if resize:
+            # samples[i] = resize_image(samples[i], resize[0], resize[1])
+            # samples[i] = random_crop(samples[i], resize)
         # samples[i] /= 255
     print("Parsing Done!")
     return samples, targets
@@ -202,16 +216,10 @@ def plot_accuracy_loss_graph(path=None, name=None):
         data = json.load(history_file)
         plt.plot(data['acc'])
         plt.plot(data['val_acc'])
+        plt.plot(data['loss'])
+        plt.plot(data['val_loss'])
         plt.title('Model Accuracy ('+name+')')
         plt.ylabel('Accuracy')
         plt.xlabel('Epoch')
-        plt.legend(['Train', 'Val'], loc='upper left')
-        plt.show()
-        # Plot training & validation loss values
-        plt.plot(data['loss'])
-        plt.plot(data['val_loss'])
-        plt.title('Model Loss ('+name+')')
-        plt.ylabel('Loss')
-        plt.xlabel('Epoch')
-        plt.legend(['Train', 'Val'], loc='upper left')
+        plt.legend(['Train', 'Val', 'Loss', 'Val_loss'], loc='upper left')
         plt.show()
