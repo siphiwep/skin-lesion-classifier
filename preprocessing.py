@@ -16,8 +16,8 @@ CROP_SIZE = 224
 SEED = 1000
 
 AUG_PATH='data' # Store the transformed image into the project folder
-IMAGE_PATH="G:\SORTED-2017" #  Folder containing all the image to augment.
-BINARY_DATA='G:\SORTED-2017\masks'
+IMAGE_PATH="G:\\SORTED-2018" #  Folder containing all the image to augment.
+# BINARY_DATA='G:\SORTED-2017\masks'
 
 def read_images(filepath):
     all_images = []
@@ -25,7 +25,10 @@ def read_images(filepath):
 
     images = [i for i in os.listdir(os.path.join(filepath)) if i.endswith(('.jpg', '.png'))]
     for path in images:
-        all_images.append(openCv.imread(os.path.join(filepath, path)))
+        img = openCv.imread(os.path.join(filepath, path))
+        # hsv_img = openCv.cvtColor(img, openCv.COLOR_RGB2HSV)
+
+        all_images.append(img)
         image_names.append(path)
     return all_images, image_names
 
@@ -34,7 +37,7 @@ def resize_images(images, width=256, height=256):
     for image in images:
         resize_image = openCv.resize(image, (IMAGE_SIZE,IMAGE_SIZE))
         resized_images.append(resize_image)
-    np.array(resized_images, dtype ="float") / 255.0
+    np.array(resized_images, dtype ="float") 
     return resized_images
 
 def apply_central_crop():
@@ -118,56 +121,56 @@ def add_augs():
     for parentdir in os.listdir(IMAGE_PATH):
         print("Reading sub-folders in {0} ".format(parentdir))
 
-        if(parentdir == "train"): 
+        for subdir in os.listdir(os.path.join(IMAGE_PATH, parentdir)):
+            print("Reading sub-folders in {0} ".format(subdir))
+            segmented_images = []
+            enhanced_images = []
+            # print("Reading sub-folders in {0} ".format(mmetadir))
+            images, names = read_images(os.path.join(IMAGE_PATH, parentdir, subdir))
+            # import pdb; pdb.set_trace()
+            # no_hair_images = removeHair(images)
+            # for image, image_name in  zip(images, names):
+                # mask = read_image(os.path.join(BINARY_DATA, image_name.split('.')[0]+'_segmentation.png'))
+                # segmented_images.append(segment_images(image,mask))
+            # print("{} will be rotated and flipped".format(len(images)))
+            # resized_images = resize_images(images)
+            # rotated_images = rotate_images(images)
+            # print("Rotated {}".format(len(cropped_images_rot)))
+            # save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
 
-            for subdir in os.listdir(os.path.join(IMAGE_PATH, parentdir)):
-                print("Reading sub-folders in {0} ".format(subdir))
-                for mmetadir in os.listdir(os.path.join(IMAGE_PATH, parentdir, subdir)):
-                    segmented_images = []
-                    enhanced_images = []
-                    print("Reading sub-folders in {0} ".format(mmetadir))
-                    images, names = read_images(os.path.join(IMAGE_PATH, parentdir, subdir, mmetadir))
-                    # no_hair_images = removeHair(images)
-                    for image, image_name in  zip(images, names):
-                        mask = read_image(os.path.join(BINARY_DATA, image_name.split('.')[0]+'_segmentation.png'))
-                        segmented_images.append(segment_images(image,mask))
-                    # print("{} will be rotated and flipped".format(len(images)))
-                    resized_images = resize_images(segmented_images)
-                    rotated_images = rotate_images(resized_images)
-                    # print("Rotated {}".format(len(cropped_images_rot)))
-                    # save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
+            # flipped_images = flip_images(rotated_images)
+            # cropped_images = random_crop(resized_images, 3)
+            # import pdb; pdb.set_trace()
+            # print("Flipped  {}".format(len(flipped_images)))
+            # for img in images:
+            #     grayImg = openCv.cvtColor(img, openCv.COLOR_HSV2RGB) 
+            #     grayImg = openCv.cvtColor(grayImg, openCv.COLOR_RGB2GRAY) 
+            #     clahImg = applyClahe(grayImg)
+            #     enhanced_images.append(openCv.cvtColor(clahImg, openCv.COLOR_GRAY2RGB))
+            resized_images = resize_images(images)
+            # print("Cropped  {}".format(len(cropped_images)))
+            # flipped_rotated =  np.concatenate((rotated_images, flipped_images))
+            # cropped_images = random_crop(flipped_rotated,5)
+            save_images(filepath='/'.join([AUG_PATH, parentdir, subdir]), images=resized_images, prefix="im")
 
-                    flipped_images = flip_images(rotated_images)
-                    # cropped_images = random_crop(resized_images, 3)
-                    # import pdb; pdb.set_trace()
-                    # print("Flipped  {}".format(len(flipped_images)))
-                    for img in flipped_images:
-                        grayImg = openCv.cvtColor(img, openCv.COLOR_BGR2GRAY) 
-                        clahImg = applyClahe(grayImg)
-                        enhanced_images.append(openCv.cvtColor(clahImg, openCv.COLOR_GRAY2BGR))
-                    # print("Cropped  {}".format(len(cropped_images)))
-                    # flipped_rotated =  np.concatenate((rotated_images, flipped_images))
-                    # cropped_images = random_crop(flipped_rotated,5)
-                    save_images(filepath='/'.join([AUG_PATH, parentdir, subdir,mmetadir]), images=enhanced_images, prefix="im")
+        # elif (parentdir != 'masks'): #and parentdir !='test' and parentdir != 'val'):
+        #     for subdir in os.listdir(os.path.join(IMAGE_PATH, parentdir)):
+        #             print("Reading sub-folders in {0} ".format(subdir))
+        #             for mmetadir in os.listdir(os.path.join(IMAGE_PATH, parentdir, subdir)):
+        #                 print("Reading sub-folders in {0} ".format(mmetadir))
+        #                 images, names= read_images(os.path.join(IMAGE_PATH, parentdir, subdir, mmetadir))
+        #                 # masks = read_images(os.path.join(BINARY_DATA, parentdir, subdir))
+        #                 # no_hair_images = removeHair(images)
+        #                 # segmented = segment_images(no_hair_images,masks)
+        #                 # print("{} will be rotated and flipped".format(len(images)))
+        #                 resized_images = resize_images(images)
+        #                 # print("Rotated {}".format(len(cropped_images_rot)))
+        #                 # save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
 
-        elif (parentdir != 'masks'): #and parentdir !='test' and parentdir != 'val'):
-            for subdir in os.listdir(os.path.join(IMAGE_PATH, parentdir)):
-                    print("Reading sub-folders in {0} ".format(subdir))
-                    for mmetadir in os.listdir(os.path.join(IMAGE_PATH, parentdir, subdir)):
-                        print("Reading sub-folders in {0} ".format(mmetadir))
-                        images, names= read_images(os.path.join(IMAGE_PATH, parentdir, subdir, mmetadir))
-                        # masks = read_images(os.path.join(BINARY_DATA, parentdir, subdir))
-                        # no_hair_images = removeHair(images)
-                        # segmented = segment_images(no_hair_images,masks)
-                        # print("{} will be rotated and flipped".format(len(images)))
-                        resized_images = resize_images(images)
-                        # print("Rotated {}".format(len(cropped_images_rot)))
-                        # save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
+        #                 # flipped_images = flip_images(images)
+        #                 # cropped_images = random_crop(resized_images, 1)
 
-                        # flipped_images = flip_images(images)
-                        # cropped_images = random_crop(resized_images, 1)
-
-                        save_images(filepath='/'.join([AUG_PATH, parentdir, subdir,mmetadir]), images=resized_images, prefix="im")
+        #                 save_images(filepath='/'.join([AUG_PATH, parentdir, subdir,mmetadir]), images=resized_images, prefix="im")
 
 def removeHair(images):
     r_images = []

@@ -14,23 +14,23 @@ if __name__ == "__main__":
     # CREATE MODEL 
 
     # # this is the model we will train
-    inceptionV3 = InceptionV3(input_shape=(224, 224, 3), classes=3, activation=ACTIVATION, include_top=False, weights='imagenet')
+    inceptionV3 = InceptionV3(input_shape=(224, 224, 3), classes=7, activation=ACTIVATION, include_top=False, weights='imagenet')
     model = inceptionV3.model()
     model = set_non_trainable(model)
     x = model.output
     x=Dense(1024,activation=ACTIVATION)(x) 
     x=Dense(1024,activation=ACTIVATION)(x) 
-    x=Dense(3,activation='softmax')(x) 
+    x=Dense(7,activation='softmax')(x) 
     model = Model(model.input, x, name='inceptionV3')
     # model.summary()
-    util = ModelUtils(epochs=20)
+    util = ModelUtils(epochs=5)
     # util.get_train_data(resize=(224,224))
     util.get_train_data()
-    util.get_val_data()
-    util.get_test_data()
+    # util.get_val_data()
+    # util.get_test_data()
     util.train(model, name=ACTIVATION)
     util.evaluate()
-    # util.save(name=ACTIVATION)
+    util.save(name=ACTIVATION)
     util.confusion_matrix(title=model.name)
     util.plot_loss_accuracy(path=model.name+'.json', name=model.name)
     
