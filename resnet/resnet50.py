@@ -150,20 +150,20 @@ class  ResNet50:
         x = self.identity_block(x, 3, [512, 512, 2048], stage=5, block='b')
         x = self.identity_block(x, 3, [512, 512, 2048], stage=5, block='c')
 
-        if self.include_top:
-            x = layers.GlobalAveragePooling2D(name='avg_pool')(x)
-            x = layers.Dense(self.classes, activation='softmax', name='fc1000')(x)
-        else:
-            if self.pooling == 'avg':
-                x = layers.GlobalAveragePooling2D()(x)
-            elif self.pooling == 'max':
-                x = layers.GlobalMaxPooling2D()(x)
-            else:
-                warnings.warn('The output shape of `ResNet50(include_top=False)` '
-                            'has been changed since Keras 2.2.0.')
+        # if self.include_top:
+        #     x = layers.GlobalAveragePooling2D(name='avg_pool')(x)
+        #     x = layers.Dense(self.classes, activation='softmax', name='fc1000')(x)
+        # else:
+        #     if self.pooling == 'avg':
+        #         x = layers.GlobalAveragePooling2D()(x)
+        #     elif self.pooling == 'max':
+        #         x = layers.GlobalMaxPooling2D()(x)
+        #     else:
+        #         warnings.warn('The output shape of `ResNet50(include_top=False)` '
+        #                     'has been changed since Keras 2.2.0.')
 
-        # Ensure that the model takes into account
-        # any potential predecessors of `input_tensor`.
+        # # Ensure that the model takes into account
+        # # any potential predecessors of `input_tensor`.
     
         inputs = self.init
         # Create model.

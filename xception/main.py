@@ -1,32 +1,34 @@
-import sys
+import sys 
 sys.path.append("..") 
 from data_utils import *
-from inception.inception_v3 import InceptionV3
 from utils.transfer import set_non_trainable
+from xception.xception_v1 import Xception
 from datetime import datetime
 from utils.model_utils import ModelUtils
 from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D, GlobalAveragePooling2D
 from keras.models import Model
-
+# valid values: Mish, relu, selu, tanh
 ACTIVATION='relu'
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
 
     # # this is the model we will train
-    inceptionV3 = InceptionV3(input_shape=(224, 224, 3), classes=7, activation=ACTIVATION, include_top=False, weights='imagenet')
-    model = inceptionV3.model()
+    xception = Xception(input_shape=(224, 224, 3), classes=7, activation=ACTIVATION, include_top=False, weights='imagenet')
+    model = xception.model()
     model = set_non_trainable(model)
     x = model.output
-     # x = Dropout(0.2) (x)
-    x=Dense(4096,activation=ACTIVATION)(x) 
-    x=Dense(4096,activation=ACTIVATION)(x) 
-    x=Dense(7,activation='softmax')(x) 
-    x = Dropout(0.2) (x)
-    model = Model(model.input, x, name='inceptionV3')
-    # model.summary()
+    # x = Dropout(0.2) (x)
+    x=Dense(2048,activation=ACTIVATION)(x)
+    x=Dense(2048,activation=ACTIVATION)(x) 
+    # x = Dropout(0.2) (x)
 
-    util = ModelUtils(epochs=10)
+    x=Dense(7,activation='softmax')(x) 
+    model = Model(model.input, x, name='xception')
+    model.summary()
+    
+
+    util = ModelUtils(epochs=60)
     util.get_train_data()
     # util.get_val_data()
     # util.get_test_data()

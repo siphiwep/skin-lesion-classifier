@@ -26,9 +26,9 @@ def read_images(filepath):
     images = [i for i in os.listdir(os.path.join(filepath)) if i.endswith(('.jpg', '.png'))]
     for path in images:
         img = openCv.imread(os.path.join(filepath, path))
-        # hsv_img = openCv.cvtColor(img, openCv.COLOR_RGB2HSV)
+        hsv_img = openCv.cvtColor(img, openCv.COLOR_RGB2HSV)
 
-        all_images.append(img)
+        all_images.append(hsv_img)
         image_names.append(path)
     return all_images, image_names
 
@@ -142,15 +142,12 @@ def add_augs():
             # cropped_images = random_crop(resized_images, 3)
             # import pdb; pdb.set_trace()
             # print("Flipped  {}".format(len(flipped_images)))
-            # for img in images:
-            #     grayImg = openCv.cvtColor(img, openCv.COLOR_HSV2RGB) 
-            #     grayImg = openCv.cvtColor(grayImg, openCv.COLOR_RGB2GRAY) 
-            #     clahImg = applyClahe(grayImg)
-            #     enhanced_images.append(openCv.cvtColor(clahImg, openCv.COLOR_GRAY2RGB))
-            resized_images = resize_images(images)
-            # print("Cropped  {}".format(len(cropped_images)))
-            # flipped_rotated =  np.concatenate((rotated_images, flipped_images))
-            # cropped_images = random_crop(flipped_rotated,5)
+            for img in images:
+                grayImg = openCv.cvtColor(img, openCv.COLOR_HSV2RGB) 
+                grayImg = openCv.cvtColor(grayImg, openCv.COLOR_RGB2GRAY) 
+                clahImg = applyClahe(grayImg)
+                enhanced_images.append(openCv.cvtColor(clahImg, openCv.COLOR_GRAY2RGB))
+            resized_images = resize_images(enhanced_images)
             save_images(filepath='/'.join([AUG_PATH, parentdir, subdir]), images=resized_images, prefix="im")
 
         # elif (parentdir != 'masks'): #and parentdir !='test' and parentdir != 'val'):

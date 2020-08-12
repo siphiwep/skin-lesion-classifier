@@ -17,3 +17,6 @@ __pycache__
 *.
 
 *.json
+
+*.jpg
+*.png

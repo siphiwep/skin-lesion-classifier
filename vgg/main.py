@@ -8,7 +8,7 @@ from utils.model_utils import ModelUtils
 from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D, GlobalAveragePooling2D
 from keras.models import Model
 # valid values: Mish, relu, selu, tanh
-ACTIVATION='tanh'
+ACTIVATION='relu'
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
@@ -25,7 +25,8 @@ if __name__ == "__main__":
 
     x=Dense(7,activation='softmax')(x) 
     model = Model(model.input, x, name='vgg19')
-    # model.summary()
+    model.summary()
+    
 
     util = ModelUtils(epochs=60)
     util.get_train_data()
@@ -34,7 +35,7 @@ if __name__ == "__main__":
     # util.mean_subtraction()
     util.train(model, name=ACTIVATION)
     util.evaluate()
-    # util.save(name=ACTIVATION)
+    util.save(name=ACTIVATION)
     util.confusion_matrix(name=model.name)
     util.plot_loss_accuracy(path=model.name+'.json', name=model.name)
     

@@ -2,7 +2,7 @@ import os
 import numpy as np
 import json
 import keras as ke
-from keras.optimizers import SGD
+from keras.optimizers import SGD, Adam
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from keras.models import load_model
@@ -10,7 +10,9 @@ from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_curve, roc_auc_score
 from sklearn.metrics import classification_report
 from data_utils import build_image_dataset_from_dir, get_labels, onehot_to_cat, plot_confusion_matrix, plot_accuracy_loss_graph
-from keras.applications.vgg19 import preprocess_input
+# from keras.applications.vgg19 import preprocess_input
+# from keras.applications.vgg16 import preprocess_input
+from xception.xception_v1 import preprocess_input
 from keras import backend as K
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -26,7 +28,7 @@ class ModelUtils():
         self.epochs=epochs
         self.test_split=test_split
         self.validation=validation_split
-        self.batch_size = 64
+        self.batch_size = 32
 
     def get_train_data(self, name=FOLDER, folder='../data/', resize=None):
         self.x, self.y = build_image_dataset_from_dir(os.path.join(folder, name),
@@ -82,12 +84,12 @@ class ModelUtils():
         aug = ImageDataGenerator(
             # preprocessing_function=preprocess_input,
             rotation_range=90, 
-			# zoom_range=0.15,
+			zoom_range=0.15,
 			width_shift_range=0.2,
-			# height_shift_range=0.2,
+			height_shift_range=0.2,
 			shear_range=0.25,
 			horizontal_flip=True,
-            # vertical_flip=True,
+            vertical_flip=True,
 			fill_mode="nearest"
         )
         valAug = ImageDataGenerator(
@@ -107,12 +109,10 @@ class ModelUtils():
         if(os.path.exists('../models/'+self.model.name+FOLDER+name+'.h5')):
             self.model.load_weights('../models/'+self.model.name+FOLDER+name+'.h5') 
         else:
-       
             self.history = self.model.fit_generator(aug.flow(self.x,self.y, batch_size=self.batch_size, shuffle=True, seed=1000),
                 steps_per_epoch=len(self.x)/self.batch_size ,epochs=self.epochs, verbose=1, 
                 validation_steps=len(self.valX) / self.batch_size,
                 validation_data=valAug.flow(self.valX, self.valY, batch_size=self.batch_size, shuffle=True, seed=1000))
-
             with open(self.model.name+FOLDER+name+'.json', 'w') as file:
                 json.dump(self.history.history, file)
 
@@ -127,7 +127,8 @@ class ModelUtils():
         self.model.save_weights(folder+'/'+self.model.name+FOLDER+name+'.h5')
 
     def optimizer(self):
-        return SGD(lr=0.001, momentum=0.9, decay=0.0005)
+        return SGD(lr=0.00001, momentum=0.9, decay=0.0005)
+        # return Adam(lr=0.0001)
 
     def confusion_matrix(self, name=None):
         predictions = self.model.predict(self.valX)
