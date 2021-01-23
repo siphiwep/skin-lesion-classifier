@@ -6,7 +6,7 @@ import matplotlib
 matplotlib.use("Agg")
 
 # import the necessary packages
-from pyimagesearch import config
+# from pyimagesearch import config
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.layers import AveragePooling2D
 from tensorflow.keras.layers import Dropout
@@ -17,70 +17,70 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.applications import ResNet50
 from sklearn.metrics import classification_report
-from imutils import paths
+# from imutils import paths
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 
-# construct the argument parser and parse the arguments
-ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--plot", type=str, default="plot.png",
-	help="path to output loss/accuracy plot")
-args = vars(ap.parse_args())
+# # construct the argument parser and parse the arguments
+# ap = argparse.ArgumentParser()
+# ap.add_argument("-p", "--plot", type=str, default="plot.png",
+# 	help="path to output loss/accuracy plot")
+# args = vars(ap.parse_args())
 
-# determine the total number of image paths in training, validation,
-# and testing directories
-totalTrain = len(list(paths.list_images(config.TRAIN_PATH)))
-totalVal = len(list(paths.list_images(config.VAL_PATH)))
-totalTest = len(list(paths.list_images(config.TEST_PATH)))
+# # determine the total number of image paths in training, validation,
+# # and testing directories
+# totalTrain = len(list(paths.list_images(config.TRAIN_PATH)))
+# totalVal = len(list(paths.list_images(config.VAL_PATH)))
+# totalTest = len(list(paths.list_images(config.TEST_PATH)))
 
-# initialize the training training data augmentation object
-trainAug = ImageDataGenerator(
-	rotation_range=25,
-	zoom_range=0.1,
-	width_shift_range=0.1,
-	height_shift_range=0.1,
-	shear_range=0.2,
-	horizontal_flip=True,
-	fill_mode="nearest")
+# # initialize the training training data augmentation object
+# trainAug = ImageDataGenerator(
+# 	rotation_range=25,
+# 	zoom_range=0.1,
+# 	width_shift_range=0.1,
+# 	height_shift_range=0.1,
+# 	shear_range=0.2,
+# 	horizontal_flip=True,
+# 	fill_mode="nearest")
 
-# initialize the validation/testing data augmentation object (which
-# we'll be adding mean subtraction to)
-valAug = ImageDataGenerator()
+# # initialize the validation/testing data augmentation object (which
+# # we'll be adding mean subtraction to)
+# valAug = ImageDataGenerator()
 
-# define the ImageNet mean subtraction (in RGB order) and set the
-# the mean subtraction value for each of the data augmentation
-# objects
-mean = np.array([123.68, 116.779, 103.939], dtype="float32")
-trainAug.mean = mean
-valAug.mean = mean
+# # define the ImageNet mean subtraction (in RGB order) and set the
+# # the mean subtraction value for each of the data augmentation
+# # objects
+# mean = np.array([123.68, 116.779, 103.939], dtype="float32")
+# trainAug.mean = mean
+# valAug.mean = mean
 
-# initialize the training generator
-trainGen = trainAug.flow_from_directory(
-	config.TRAIN_PATH,
-	class_mode="categorical",
-	target_size=(224, 224),
-	color_mode="rgb",
-	shuffle=True,
-	batch_size=config.BS)
+# # initialize the training generator
+# trainGen = trainAug.flow_from_directory(
+# 	config.TRAIN_PATH,
+# 	class_mode="categorical",
+# 	target_size=(224, 224),
+# 	color_mode="rgb",
+# 	shuffle=True,
+# 	batch_size=config.BS)
 
-# initialize the validation generator
-valGen = valAug.flow_from_directory(
-	config.VAL_PATH,
-	class_mode="categorical",
-	target_size=(224, 224),
-	color_mode="rgb",
-	shuffle=False,
-	batch_size=config.BS)
+# # initialize the validation generator
+# valGen = valAug.flow_from_directory(
+# 	config.VAL_PATH,
+# 	class_mode="categorical",
+# 	target_size=(224, 224),
+# 	color_mode="rgb",
+# 	shuffle=False,
+# 	batch_size=config.BS)
 
-# initialize the testing generator
-testGen = valAug.flow_from_directory(
-	config.TEST_PATH,
-	class_mode="categorical",
-	target_size=(224, 224),
-	color_mode="rgb",
-	shuffle=False,
-	batch_size=config.BS)
+# # initialize the testing generator
+# testGen = valAug.flow_from_directory(
+# 	config.TEST_PATH,
+# 	class_mode="categorical",
+# 	target_size=(224, 224),
+# 	color_mode="rgb",
+# 	shuffle=False,
+# 	batch_size=config.BS)
 
 # load the ResNet-50 network, ensuring the head FC layer sets are left
 # off
@@ -91,6 +91,7 @@ baseModel = ResNet50(weights="imagenet", include_top=False,
 # construct the head of the model that will be placed on top of the
 # the base model
 headModel = baseModel.output
+import pdb; pdb.set_trace()
 headModel = AveragePooling2D(pool_size=(7, 7))(headModel)
 headModel = Flatten(name="flatten")(headModel)
 headModel = Dense(256, activation="relu")(headModel)

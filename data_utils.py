@@ -6,13 +6,13 @@ import json
 import random
 import numpy as np
 from PIL import Image
+import tensorflow as tf
 import pickle
 import warnings
 from urllib.parse import urlparse
 from urllib import request
 from io import BytesIO
 import matplotlib.pyplot as plt
-from keras.preprocessing import image
 import itertools
 import random
 random.seed(1000)
@@ -44,10 +44,11 @@ def random_crop(img, random_crop_size):
     
 def load_image(in_image):
     # load image
-    img = image.img_to_array(image.load_img(in_image, target_size=(224, 224)))
-    # img = Image.open(in_image)
+    img = tf.keras.preprocessing.image.img_to_array(tf.keras.preprocessing.image.load_img(in_image, target_size=(224, 224)))
+    # imgs = Image.open(in_image)
     # import pdb; pdb.set_trace()
     # img = cv2.imread(in_image)
+    # import pdb; pdb.set_trace()
     return img
 
 def resize_image(in_image, new_width, new_height, out_image=None,
@@ -97,6 +98,7 @@ def image_dirs_to_samples(directory, resize=None, convert_to_color=False,
             # samples[i] = resize_image(samples[i], resize[0], resize[1])
             # samples[i] = random_crop(samples[i], resize)
         # samples[i] /= 255
+
     print("Parsing Done!")
     return samples, targets
 
@@ -148,23 +150,28 @@ def store_model(model, path,filename):
     #     file.write(json_model)
     model.save(path+filename+".h5")
 
-def get_labels(y_onehot):
+def get_labels(y_onehot, dataset='2018'):
     y = onehot_to_cat(y_onehot)
     labels = np.empty(len(y), dtype=object)
-    labels[y == 0 ] = "akiec"
-    labels[y == 1 ] = "bcc"
-    labels[y == 2 ] = "bkl"
-    labels[y == 3 ] = "df"
-    labels[y == 4 ] = "mel"
-    labels[y == 5 ] = "nv"
-    labels[y == 6 ] = "nv"
+    if dataset == '2018':
+        labels[y == 0 ] = "akiec"
+        labels[y == 1 ] = "bcc"
+        labels[y == 2 ] = "bkl"
+        labels[y == 3 ] = "df"
+        labels[y == 4 ] = "mel"
+        labels[y == 5 ] = "nv"
+        labels[y == 6 ] = "nv"
+    else:
+        labels[y == 0 ] = "melanoma"
+        labels[y == 1 ] = "nevus"
+        labels[y == 2 ] = "seborrheic_keratosis"
 
     return labels
 
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
-                          cmap=plt.cm.Blues):
+                          cmap=plt.cm.Blues, dataset='2018'):
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
@@ -178,13 +185,18 @@ def plot_confusion_matrix(cm, classes,
     plt.title(title)
     plt.colorbar()
     tick_marks = np.arange(len(classes))
-    labels[tick_marks == 0 ] = "akiec"
-    labels[tick_marks == 1 ] = "bcc"
-    labels[tick_marks == 2 ] = "bkl"
-    labels[tick_marks == 3 ] = "df"
-    labels[tick_marks == 4 ] = "mel"
-    labels[tick_marks == 5 ] = "nv"
-    labels[tick_marks == 6 ] = "vasc"
+    if dataset == '2018':
+        labels[tick_marks == 0 ] = "akiec"
+        labels[tick_marks == 1 ] = "bcc"
+        labels[tick_marks == 2 ] = "bkl"
+        labels[tick_marks == 3 ] = "df"
+        labels[tick_marks == 4 ] = "mel"
+        labels[tick_marks == 5 ] = "nv"
+        labels[tick_marks == 6 ] = "vasc"
+    else:
+        labels[tick_marks == 0 ] = "melanoma"
+        labels[tick_marks == 1 ] = "nevus"
+        labels[tick_marks == 2 ] = "seborrheic_keratosis"
 
     plt.xticks(tick_marks, classes, rotation=45)
     plt.yticks(tick_marks, classes)

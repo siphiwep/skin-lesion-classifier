@@ -6,9 +6,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from keras.layers import Activation
-from keras.utils.generic_utils import get_custom_objects
-import keras.backend as K
+import tensorflow as tf
+from tensorflow.python.keras.layers import Activation
 
 class Mish(Activation):
     '''
@@ -30,6 +29,6 @@ class Mish(Activation):
 
 
 def mish(x):
-    return x*K.tanh(K.softplus(x))
+    return x*tf.keras.backend.tanh(tf.keras.backend.softplus(x))
 
-get_custom_objects().update({'Mish': Mish(mish)})
+tf.keras.utils.get_custom_objects().update({'Mish': Mish(mish)})
